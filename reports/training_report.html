@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Training Report</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .chart { width: 100%; height: 400px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Model Training Report</h1>
+    
+    <h2>Loss Trend</h2>
+    <div id="lossChart" class="chart"></div>
+    
+    <h2>Accuracy Trend</h2>
+    <div id="accuracyChart" class="chart"></div>
+    
+    <script>
+        const history = {"loss":[],"accuracy":[],"val_loss":[],"val_accuracy":[]};
+        
+        // Plot loss chart
+        Plotly.newPlot('lossChart', [
+            {
+                y: history.loss,
+                name: 'Training Loss',
+                type: 'scatter'
+            },
+            {
+                y: history.val_loss,
+                name: 'Validation Loss',
+                type: 'scatter'
+            }
+        ], {
+            title: 'Loss Trend',
+            xaxis: { title: 'Epoch' },
+            yaxis: { title: 'Loss' }
+        });
+        
+        // Plot accuracy chart
+        Plotly.newPlot('accuracyChart', [
+            {
+                y: history.accuracy,
+                name: 'Training Accuracy',
+                type: 'scatter'
+            },
+            {
+                y: history.val_accuracy,
+                name: 'Validation Accuracy',
+                type: 'scatter'
+            }
+        ], {
+            title: 'Accuracy Trend',
+            xaxis: { title: 'Epoch' },
+            yaxis: { title: 'Accuracy' }
+        });
+    </script>
+</body>
+</html>
+    

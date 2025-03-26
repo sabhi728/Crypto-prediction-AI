@@ -1,0 +1,30 @@
+{
+  "name": "crypto-predict-ai",
+  "version": "1.0.0",
+  "description": "crypto-predict-ai is a Bitcoin price data collector. Its main function is to collect and process Bitcoin price data, which may be used for analysis, prediction, or other related applications. The project's description indicates that it focuses on data collection in the Bitcoin market",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "fetch:full": "node index.js --mode=full",
+    "fetch:increment": "node index.js --mode=increment",
+    "start:scheduler": "node src/scheduler.js",
+    "validate": "node index.js --mode=validate",
+    "start:web": "node src/server.js",
+    "train": "node src/train.js",
+    "validate:exchanges": "node src/validate_exchanges.js"
+  },
+  "dependencies": {
+    "@tensorflow/tfjs": "^4.22.0",
+    "@vitalets/google-translate-api": "^9.2.0",
+    "axios": "^1.6.2",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "https-proxy-agent": "^7.0.6",
+    "ml-matrix": "^6.10.4",
+    "moment": "^2.29.4",
+    "node-cron": "^3.0.3",
+    "winston": "^3.11.0",
+    "ws": "^8.18.1",
+    "yargs": "^17.7.2"
+  }
+}

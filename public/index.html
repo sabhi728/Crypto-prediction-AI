@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin Price Chart</title>
+    <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        select, button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #chart {
+            height: 600px;
+            width: 100%;
+        }
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="controls">
+            <select id="exchangeSelect">
+                <option value="binance">Binance</option>
+                <option value="huobi">Huobi</option>
+                <option value="okx">OKX</option>
+            </select>
+            <select id="timeframeSelect">
+                <option value="1D">Daily</option>
+                <option value="1W">Weekly</option>
+                <option value="1M">Monthly</option>
+            </select>
+        </div>
+        <div id="chart"></div>
+    </div>
+    <div class="loading" id="loading">Loading...</div>
+
+    <script>
+        let chart;
+        let candlestickSeries;
+        let volumeSeries;
+
+        // Initialize chart
+        function initChart() {
+            if (chart) {
+                document.getElementById('chart').innerHTML = '';
+            }
+
+            // Create main chart
+            chart = LightweightCharts.createChart(document.getElementById('chart'), {
+                width: document.getElementById('chart').clientWidth,
+                height: 600,
+                layout: {
+                    backgroundColor: '#ffffff',
+                    textColor: '#333',
+                },
+                grid: {
+                    vertLines: { color: '#f0f0f0' },
+                    horzLines: { color: '#f0f0f0' },
+                },
+                crosshair: {
+                    mode: LightweightCharts.CrosshairMode.Normal,
+                },
+                rightPriceScale: {
+                    borderColor: '#f0f0f0',
+                },
+                timeScale: {
+                    borderColor: '#f0f0f0',
+                    timeVisible: true,
+                    secondsVisible: false,
+                },
+            });
+
+            // Create candlestick series
+            candlestickSeries = chart.addCandlestickSeries({
+                upColor: '#4CAF50',
+                downColor: '#f44336',
+                borderVisible: false,
+                wickUpColor: '#4CAF50',
+                wickDownColor: '#f44336',
+            });
+
+            // Create volume series
+            volumeSeries = chart.addHistogramSeries({
+                color: '#26a69a',
+                priceFormat: {
+                    type: 'volume',
+                },
+                priceScaleId: '',
+                scaleMargins: {
+                    top: 0.8,
+                    bottom: 0,
+                },
+            });
+
+            return { candlestickSeries, volumeSeries };
+        }
+
+        // Load data from API
+        async function loadData() {
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+
+            try {
+                const exchange = document.getElementById('exchangeSelect').value;
+                const timeframe = document.getElementById('timeframeSelect').value;
+                
+                const response = await fetch(`/api/klines?exchange=${exchange}&timeframe=${timeframe}`);
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error?.message || 'Failed to load data');
+                }
+
+                // Check data
+                if (!result.data || result.data.length === 0) {
+                    throw new Error('No data available');
+                }
+
+                // Initialize or reinitialize chart
+                const { candlestickSeries, volumeSeries } = initChart();
+
+                // Convert data format for chart
+                const chartData = result.data.map(item => ({
+                    time: item.date,
+                    open: parseFloat(item.open),
+                    high: parseFloat(item.high),
+                    low: parseFloat(item.low),
+                    close: parseFloat(item.close),
+                    volume: parseFloat(item.volume)
+                }));
+
+                // Update chart data
+                candlestickSeries.setData(chartData);
+                volumeSeries.setData(chartData.map(item => ({
+                    time: item.time,
+                    value: item.volume,
+                    color: item.close >= item.open ? 'rgba(76, 175, 80, 0.5)' : 'rgba(255, 82, 82, 0.5)'
+                })));
+
+                // Show warning if any
+                if (result.warning) {
+                    console.warn(result.warning);
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                alert(error.message || 'Failed to load data, please try again');
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        function calculateMA(data, period) {
+            const result = [];
+            for (let i = period - 1; i < data.length; i++) {
+                const sum = data.slice(i - period + 1, i + 1)
+                    .reduce((acc, val) => acc + val.close, 0);
+                result.push({
+                    time: data[i].time,
+                    value: sum / period
+                });
+            }
+            return result;
+        }
+
+        // Add volume formatting function
+        function formatVolume(volume) {
+            if (volume >= 1000000) {
+                return (volume / 1000000).toFixed(2) + 'M';
+            } else if (volume >= 1000) {
+                return (volume / 1000).toFixed(2) + 'K';
+            }
+            return volume.toFixed(2);
+        }
+
+        // Add event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize chart
+            initChart();
+            
+            // Add exchange and timeframe selection event listeners
+            document.getElementById('exchangeSelect').addEventListener('change', loadData);
+            document.getElementById('timeframeSelect').addEventListener('change', loadData);
+            
+            // Initial data load
+            loadData();
+        });
+
+        // Responsive adjustment
+        window.addEventListener('resize', () => {
+            if (chart) {
+                chart.applyOptions({
+                    width: document.getElementById('chart').clientWidth
+                });
+            }
+        });
+    </script>
+</body>
+</html> 

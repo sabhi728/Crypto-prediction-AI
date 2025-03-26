@@ -1,0 +1,113 @@
+{
+  "format": "layers-model",
+  "generatedBy": "TensorFlow.js tfjs v3.18.0",
+  "convertedBy": null,
+  "modelTopology": {
+    "class_name": "Sequential",
+    "config": {
+      "name": "sequential_1",
+      "layers": [
+        {
+          "class_name": "Dense",
+          "config": {
+            "units": 16,
+            "activation": "relu",
+            "use_bias": true,
+            "kernel_initializer": {
+              "class_name": "HeNormal",
+              "config": {
+                "seed": null
+              }
+            },
+            "bias_initializer": {
+              "class_name": "Zeros",
+              "config": {}
+            },
+            "kernel_regularizer": null,
+            "bias_regularizer": null,
+            "activity_regularizer": null,
+            "kernel_constraint": null,
+            "bias_constraint": null,
+            "name": "dense_1",
+            "trainable": true,
+            "batch_input_shape": [
+              null,
+              20
+            ],
+            "dtype": "float32"
+          }
+        },
+        {
+          "class_name": "Dropout",
+          "config": {
+            "rate": 0.2,
+            "noise_shape": null,
+            "seed": null,
+            "name": "dropout_1",
+            "trainable": true
+          }
+        },
+        {
+          "class_name": "Dense",
+          "config": {
+            "units": 8,
+            "activation": "relu",
+            "use_bias": true,
+            "kernel_initializer": {
+              "class_name": "HeNormal",
+              "config": {
+                "seed": null
+              }
+            },
+            "bias_initializer": {
+              "class_name": "Zeros",
+              "config": {}
+            },
+            "kernel_regularizer": null,
+            "bias_regularizer": null,
+            "activity_regularizer": null,
+            "kernel_constraint": null,
+            "bias_constraint": null,
+            "name": "dense_2",
+            "trainable": true
+          }
+        },
+        {
+          "class_name": "Dense",
+          "config": {
+            "units": 3,
+            "activation": "softmax",
+            "use_bias": true,
+            "kernel_initializer": {
+              "class_name": "HeNormal",
+              "config": {
+                "seed": null
+              }
+            },
+            "bias_initializer": {
+              "class_name": "Zeros",
+              "config": {}
+            },
+            "kernel_regularizer": null,
+            "bias_regularizer": null,
+            "activity_regularizer": null,
+            "kernel_constraint": null,
+            "bias_constraint": null,
+            "name": "dense_3",
+            "trainable": true
+          }
+        }
+      ]
+    },
+    "keras_version": "tfjs-layers 3.18.0",
+    "backend": "tensor_flow.js"
+  },
+  "weightsManifest": [
+    {
+      "paths": [
+        "weights.bin"
+      ],
+      "weights": []
+    }
+  ]
+}
