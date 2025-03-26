@@ -1,6 +1,6 @@
-# Crypto Predict AI
+# Crypto Prediction AI
 
-crypto-predict-ai is a Bitcoin price data collection, analysis and prediction tool. It uses machine learning models to analyze Bitcoin market trends and supports multiple exchange data sources.
+Crypto-prediction-AI is a Bitcoin price data collection, analysis and prediction tool. It uses machine learning models to analyze Bitcoin market trends and supports multiple exchange data sources.
 
 ![Analysis Screenshot](https://raw.githubusercontent.com/sabhi728/Crypto-prediction-AI/refs/heads/main/screenshot/bitcoin.png)
 
